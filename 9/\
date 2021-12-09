@@ -1,0 +1,19 @@
+import pprint 
+pp = pprint.PrettyPrinter(indent=2)
+
+file = open('test','r')
+#file = open('data','r')
+
+for lnum, line in enumerate(file):
+    if lnum == 0:
+        p2 = list(line)
+        break
+    elif lnum == 1:
+        p1 = list(line)
+        break
+
+    p0 = list(line)
+
+    p2 = p1
+    p1 = p0
+
