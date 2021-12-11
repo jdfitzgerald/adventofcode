@@ -24,7 +24,7 @@ def add_one(x,y):
 		add_one(x+1,y+1)
 
 flashes=0
-for step in range(0,100):
+for step in range(0,1000):
 	for y in range(0,10):
 		for x in range(0,10):
 			add_one(x,y)
@@ -34,6 +34,9 @@ for step in range(0,100):
 			if grid[y][x] >= 10:
 				flashes+=1
 				grid[y][x]=0
+	if sum([x for row in grid for x in row]) == 0:
+		break
+	
 
-pp.pprint(flashes)
+pp.pprint(step+1)
 
