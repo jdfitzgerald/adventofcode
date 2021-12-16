@@ -4,18 +4,6 @@ pp = pprint.PrettyPrinter(indent=2)
 #file = open('test','r')
 file = open('data','r')
 
-"""
-grid = []
-for y, line in enumerate(file):
-	grid.append([int(c) for c in line.strip()])
-
-pp.pprint(grid)
-max_x = len(grid[0])-1
-max_y = len(grid)-1
-
-
-"""
-
 costs = {(x,y):int(cost) for y, line in enumerate(file) for x,cost in enumerate(line.strip())}
 
 (max_x,max_y) = list(costs.keys())[-1]
