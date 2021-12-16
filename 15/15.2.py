@@ -1,13 +1,9 @@
 import pprint 
 pp = pprint.PrettyPrinter(indent=2)
 
-#file = open('test','r')
+file = open('test','r')
 file = open('data','r')
 
-import cProfile, pstats, io
-from pstats import SortKey
-pr = cProfile.Profile()
-pr.enable()
 
 costs = {(x,y):int(cost) for y, line in enumerate(file) for x,cost in enumerate(line.strip())}
 
@@ -16,6 +12,7 @@ costs = {(x,y):int(cost) for y, line in enumerate(file) for x,cost in enumerate(
 size_x = ((tx+1) * 5)
 size_y = ((ty+1) * 5)
 
+# expand out the grid
 for y in range(0,size_y):
     if y > ty:
         for x in range(0,tx+1):
@@ -23,23 +20,12 @@ for y in range(0,size_y):
     for x in range(tx+1,size_x):
         costs[(x,y)] = 1+(costs[(x-tx-1,y)])%9
 
-"""
-for y in range(0,size_y):
-    print(y, end=':')
-    for x in range(0,size_x):
-        print(costs[(x,y)], end='')
-    print()
-"""
-
-
-
 paths = {}
-unvisited_nodes = []
+visited_nodes = {}
 
 import sys
 for node in costs:
     paths[node]=sys.maxsize
-    unvisited_nodes.append(node)
 
 
 def get_neighbours(node):
@@ -55,36 +41,21 @@ def get_neighbours(node):
 costs[(0,0)] = 0
 paths[(0,0)] = 0
 
+from heapq import heappush, heappop
 
-breaker = 0
-def get_min_node():
-    cur_node = unvisited_nodes[0]
-    for node in unvisited_nodes:
-        if paths[node] < paths[cur_node]: cur_node = node
-    return cur_node
+unvisited_nodes = [(0,(0,0))]
 
 while len(unvisited_nodes) > 0:
-    print(len(unvisited_nodes))
-    #cur_node = min({k:paths[k] for k in unvisited_nodes}, key=paths.get)
-    cur_node = get_min_node()
+    cur_node = heappop(unvisited_nodes)[1]
 
-    unvisited_nodes.remove(cur_node)
+    visited_nodes[cur_node]=1
+
     for node in get_neighbours(cur_node):
-        paths[node] = min(paths[node], paths[cur_node]+costs[node])
-
-    breaker +=1 
-    if breaker>50: break
+        new_cost = paths[cur_node]+costs[node]
+        if paths[node] > new_cost:
+          if node not in visited_nodes: 
+            if (paths[node],node) in unvisited_nodes: unvisited_nodes.remove((paths[node],node))
+            heappush(unvisited_nodes,(new_cost,node))
+          paths[node] = new_cost
 
 print(paths[(size_x-1,size_y-1)])
-
-
-pr.disable()
-s = io.StringIO()
-sortby = SortKey.CUMULATIVE
-ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-ps.print_stats()
-print(s.getvalue())
-
-
-
-
