@@ -38,7 +38,6 @@ for d in relative_distances:
 	pointlist = relative_distances[d]
 	while len(pointlist) >= 1:
 		point = pointlist[0]
-		print(pointlist)
 		pointlist = pointlist[1:]
 		for p in pointlist:
 			if p[0] != point[0]: 
@@ -47,26 +46,29 @@ for d in relative_distances:
 		
 
 # translate points and switch axes. +/- shouldn't matter
-def transform(point, translation, axes):
+def transform(point, translation, varient):
 	# axes is a mapping of axis to index
 	res = ( 
-		point[0] + translation[axes.index('x')],
-		point[1] + translation[axes.index('y')],
-		point[2] + translation[axes.index('z')]
+		point[0] + translation[varient[1].index('x')]*varient[0][0],
+		point[1] + translation[varient[1].index('y')]*varient[0][1],
+		point[2] + translation[varient[1].index('z')]*varient[0][2]
 		)
 	return res
 
 # diff points with remapping
-def diff(A, B, axes):
+def diff(A, B, varient):
 	# axes is a mapping of axis to index
 	res = ( 
-		A[0] + B[axes.index('x')],
-		A[1] + B[axes.index('y')],
-		A[2] + B[axes.index('z')]
+		A[0] - B[varient[1].index('x')]*varient[0][0],
+		A[1] - B[varient[1].index('y')]*varient[0][1],
+		A[2] - B[varient[1].index('z')]*varient[0][2]
 		)
 	return res
 
 combos = ['xyz','xzy','yxz','yzx','zxy','zyx']
+multipliers = [[1,1,1],[1,1,-1],[1,-1,1],[1,-1,-1],[-1,1,1],[-1,1,-1],[-1,-1,1],[-1,-1,-1]]
+
+variations = [(m,c) for m in multipliers for c in combos]
 
 for (a,b) in potential_matches:
 	distinct_points = len(set([x for (x,y) in potential_matches[(a,b)]]))
@@ -87,10 +89,11 @@ for (a,b) in potential_matches:
 		for point in working[first]: 
 			print()
 			print('work:',point)
-			for axes in combos:
-				d = diff(first,point,axes)
-				print('diff',d,axes)
-				print('2nd',second,transform(second,d,axes))
+			for v in variations:
+				d = diff(first,point,v)
+				if d == (68,-1246,-43):
+					print('diff',d,v)
+					print('2nd',second,transform(second,d,v))
 
 # come up with a transformation, and check if all predicted ones exist in working
 
