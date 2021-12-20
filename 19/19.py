@@ -3,9 +3,16 @@ pp = pprint.PrettyPrinter(indent=2)
 
 file = open('test','r')
 #file = open('data','r')
+print('*******************')
+print('*******************')
 
-MAX_SCAN=2 # limit for testing
+MAX_SCAN=90 # limit for testing
 scan_data = []
+
+combos = ['xyz','xzy','yxz','yzx','zxy','zyx']
+multipliers = [[1,1,1],[1,1,-1],[1,-1,1],[1,-1,-1],[-1,1,1],[-1,1,-1],[-1,-1,1],[-1,-1,-1]]
+variations = [(m,c) for m in multipliers for c in combos]
+
 scanner = 0
 total_beacons = 0
 for line in file:
@@ -45,9 +52,7 @@ for d in relative_distances:
 				potential_matches[(point[0],p[0])].add((point[2],p[2]))
 		
 
-# translate points and switch axes. +/- shouldn't matter
-def transform(point, translation, varient):
-	# axes is a mapping of axis to index
+def transform_x(point, translation, varient):
 	res = ( 
 		point[0] + translation[varient[1].index('x')]*varient[0][0],
 		point[1] + translation[varient[1].index('y')]*varient[0][1],
@@ -55,9 +60,16 @@ def transform(point, translation, varient):
 		)
 	return res
 
+def transform(origin, point, varient):
+	res = ( 
+		origin[0] + point[varient[1].index('x')]*varient[0][0],
+		origin[1] + point[varient[1].index('y')]*varient[0][1],
+		origin[2] + point[varient[1].index('z')]*varient[0][2]
+		)
+	return res
+
 # diff points with remapping
 def diff(A, B, varient):
-	# axes is a mapping of axis to index
 	res = ( 
 		A[0] - B[varient[1].index('x')]*varient[0][0],
 		A[1] - B[varient[1].index('y')]*varient[0][1],
@@ -65,10 +77,14 @@ def diff(A, B, varient):
 		)
 	return res
 
-combos = ['xyz','xzy','yxz','yzx','zxy','zyx']
-multipliers = [[1,1,1],[1,1,-1],[1,-1,1],[1,-1,-1],[-1,1,1],[-1,1,-1],[-1,-1,1],[-1,-1,-1]]
-
-variations = [(m,c) for m in multipliers for c in combos]
+def find_scanner_transform(working):
+	((_,first),(_,second)) = sorted([(len(working[k]),k) for k in working])[0:2]
+	for point in working[first]: 
+		for v in variations:
+			d = diff(first,point,v)
+			for op in working[second]:
+				if second == transform(d,op,v):
+					return (d,v)
 
 for (a,b) in potential_matches:
 	distinct_points = len(set([x for (x,y) in potential_matches[(a,b)]]))
@@ -78,23 +94,6 @@ for (a,b) in potential_matches:
 		working=defaultdict(set)
 # refactor this to dict building later
 		for (k,v) in potential_matches[(a,b)]: working[k].add(v)
-# remember there are _always_ exactly 12 matches max
-# key with least potentials
-		blah = sorted([(len(working[k]),k) for k in working])
-		first = blah[0][1]
-		second = blah[1][1]
 
-# TODO: need to allow each axes to be -ve or +Ve - pain in th A
-		print('first',first)
-		for point in working[first]: 
-			print()
-			print('work:',point)
-			for v in variations:
-				d = diff(first,point,v)
-				if d == (68,-1246,-43):
-					print('diff',d,v)
-					print('2nd',second,transform(second,d,v))
-
-# come up with a transformation, and check if all predicted ones exist in working
-
-
+		trans = find_scanner_transform(working)
+		print('a,b relative loc', a,b,trans)
