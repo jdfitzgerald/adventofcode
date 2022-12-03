@@ -1,7 +1,7 @@
 import pprint 
 pp = pprint.PrettyPrinter(indent=2)
 
-file = open('test','r')
+#file = open('test','r')
 file = open('data','r')
 
 def priority(c):
@@ -11,9 +11,15 @@ def priority(c):
     return n
 
 pscore=0
+group = []
+index = 0
 for line in [l.strip() for l in file]:
-    c1, c2 = line[:len(line)//2],line[len(line)//2:]
-    item = set(c1).intersection(set(c2)).pop()
-    pscore += priority(item)
+    group += [set(line)]
+    index += 1
+    if index % 3 == 0: 
+        index = 0
+        badge = group[0].intersection(group[1].intersection(group[2])).pop()
+        group = []
+        pscore += priority(badge)
 
 print(pscore)
