@@ -2,7 +2,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
 file = open('test','r')
-# file = open('data','r')
+file = open('data','r')
 
 def priority(c):
     n = ord(c)
@@ -10,9 +10,10 @@ def priority(c):
     else: n -= 38
     return n
 
+pscore=0
 for line in [l.strip() for l in file]:
-    (c1, c2) = (line[0:len(line)-1],line[0:len(line)-1])
-    print(line)
-    print(c1)
-    print(c2)
-    break
+    c1, c2 = line[:len(line)//2],line[len(line)//2:]
+    item = set(c1).intersection(set(c2)).pop()
+    pscore += priority(item)
+
+print(pscore)
