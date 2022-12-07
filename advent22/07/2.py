@@ -1,8 +1,6 @@
 import pprint 
 pp = pprint.PrettyPrinter(indent=2)
 
-print('**************************************************')
-
 #file = open('test','r')
 file = open('data','r')
 
@@ -24,13 +22,10 @@ for line in [l.strip() for l in file]:
         
     else:
         if line[:3] == 'dir': continue
-        print(line)
         for i in range(len(d_stack), 0, -1):
             cur_d = '/'.join(d_stack[:i])
-            print(cur_d)
             if cur_d not in d_sizes: d_sizes[cur_d] = 0
             d_sizes[cur_d] += int(line.split(' ')[0])
-        pp.pprint(d_sizes)
 
 
 total_space = 70000000
