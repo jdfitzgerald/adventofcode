@@ -15,7 +15,6 @@ t_trees = list(map(list,zip(*trees)))
 for y in range(1,len(trees)-1):
     for x in range(1,len(trees[0])-1):
         height = trees[y][x]
-        print(x,y)
         if (height -1 >= max(trees[y][:x])
         or height -1 >= max(trees[y][x+1:])
         or height -1 >= max(t_trees[x][:y])
