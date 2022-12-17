@@ -35,14 +35,10 @@ for line in [l.strip() for l in file]:
 
 pp.pprint(valves)
 
-max_score = 0
-
 # depth first based on minutes? Or breadth?
 @lru_cache
 def stepnscore(valve, minutes, onvalves):
-    global max_score
-
-    print("At valve %s with minutes %d" % (valve,minutes))
+    global max_scores
     if minutes <= 1: raise Exception('wtf')
 
     if minutes == 2: 
@@ -52,12 +48,12 @@ def stepnscore(valve, minutes, onvalves):
             return 0
     max_poss = max_remaining_pressure(onvalves, minutes)
 
-    if max_poss == 0 or (max_poss < max_score):
+    if max_poss == 0 or (max_poss < max_scores[minutes]):
         return 0
     
     pressures = []
 
-    if valve not in onvalves and valves[valve]['rate'] > 0:
+    if valves[valve]['rate'] > 0 and valve not in onvalves:
         phere = valves[valve]['rate'] * (minutes-1)
         onvalves1 = tuple(sorted(onvalves + (valve,)))
         if minutes == 3:
@@ -70,12 +66,16 @@ def stepnscore(valve, minutes, onvalves):
     for next_valve in valves[valve]['tunnels']:
         p = stepnscore(next_valve, minutes-1, onvalves)
         pressures.append(p)
-    print("Max pressure of %s is %d" % (valve,max(pressures)))
 
     score = max(pressures)
-    max_score = max(max_score, score)
+    max_scores[minutes] = max(max_scores[minutes], score)
 
     return score
 
-mins = 5
+max_scores = {}
+mins = 20
+for m in range(1,mins+1):
+    max_scores[m]=0
+
 print('mins',mins,'result',stepnscore('AA',mins,tuple()))
+print(max_scores)
