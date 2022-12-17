@@ -35,47 +35,47 @@ for line in [l.strip() for l in file]:
 
 pp.pprint(valves)
 
+max_score = 0
+
 # depth first based on minutes? Or breadth?
 @lru_cache
-def stepnscore(valve, minutes, onvalves):
-    global max_scores
+def stepnscore(ptotal, valve, minutes, onvalves):
+    global max_score
+
+    print("At valve %s with ptotal %d and minutes %d" % (valve,ptotal,minutes))
     if minutes <= 1: raise Exception('wtf')
 
     if minutes == 2: 
         if valve not in onvalves:
-            return valves[valve]['rate']
+            return ptotal+valves[valve]['rate']
         else:
-            return 0
+            return ptotal
     max_poss = max_remaining_pressure(onvalves, minutes)
 
-    if max_poss == 0 or (max_poss < max_scores[minutes]):
-        return 0
+    if max_poss == 0:
+        return ptotal
+
+    if ptotal + max_poss < max_score:
+        return ptotal
     
+    phere = valves[valve]['rate'] * (minutes-1)
     pressures = []
 
-    if valves[valve]['rate'] > 0 and valve not in onvalves:
-        phere = valves[valve]['rate'] * (minutes-1)
+    if valve not in onvalves and minutes > 3 and phere > 0:
         onvalves1 = tuple(sorted(onvalves + (valve,)))
-        if minutes == 3:
-            pressures.append(phere)
-        else:
-            for next_valve in valves[valve]['tunnels']:
-                p = stepnscore(next_valve, minutes-2, onvalves1)
-                pressures.append(p+phere)
+        for next_valve in valves[valve]['tunnels']:
+            p = stepnscore(ptotal+phere, next_valve, minutes-2, onvalves1)
+            pressures.append(p)
 
     for next_valve in valves[valve]['tunnels']:
-        p = stepnscore(next_valve, minutes-1, onvalves)
+        p = stepnscore(ptotal, next_valve, minutes-1, onvalves)
         pressures.append(p)
+    print("Max pressure of %s is %d" % (valve,max(pressures)))
 
     score = max(pressures)
-    max_scores[minutes] = max(max_scores[minutes], score)
+    max_score = max(max_score, score)
 
     return score
 
-max_scores = {}
-mins = 20
-for m in range(1,mins+1):
-    max_scores[m]=0
-
-print('mins',mins,'result',stepnscore('AA',mins,tuple()))
-print(max_scores)
+mins = 30
+print('mins',mins,'result',stepnscore(0,'AA',mins,tuple()))
