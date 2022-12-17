@@ -17,8 +17,8 @@ def max_remaining_pressure(onvalves, minutes):
     return score
 
 pp = pprint.PrettyPrinter(indent=2)
-filename = os.path.dirname(__file__)+'/test'
-#filename = os.path.dirname(__file__)+'/data'
+#filename = os.path.dirname(__file__)+'/test'
+filename = os.path.dirname(__file__)+'/data'
 
 file = open(filename,'r')
 
@@ -42,7 +42,6 @@ max_score = 0
 def stepnscore(ptotal, valve, minutes, onvalves):
     global max_score
 
-    print("At valve %s with ptotal %d and minutes %d" % (valve,ptotal,minutes))
     if minutes <= 1: raise Exception('wtf')
 
     if minutes == 2: 
@@ -61,16 +60,18 @@ def stepnscore(ptotal, valve, minutes, onvalves):
     phere = valves[valve]['rate'] * (minutes-1)
     pressures = []
 
-    if valve not in onvalves and minutes > 3 and phere > 0:
+    if valve not in onvalves and phere > 0:
         onvalves1 = tuple(sorted(onvalves + (valve,)))
-        for next_valve in valves[valve]['tunnels']:
-            p = stepnscore(ptotal+phere, next_valve, minutes-2, onvalves1)
-            pressures.append(p)
+        if minutes==3:
+            pressures.append(phere)
+        else:
+            for next_valve in valves[valve]['tunnels']:
+                p = stepnscore(ptotal+phere, next_valve, minutes-2, onvalves1)
+                pressures.append(p)
 
     for next_valve in valves[valve]['tunnels']:
         p = stepnscore(ptotal, next_valve, minutes-1, onvalves)
         pressures.append(p)
-    print("Max pressure of %s is %d" % (valve,max(pressures)))
 
     score = max(pressures)
     max_score = max(max_score, score)
