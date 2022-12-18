@@ -17,8 +17,8 @@ def max_remaining_pressure(onvalves, minutes):
     return score
 
 pp = pprint.PrettyPrinter(indent=2)
-#filename = os.path.dirname(__file__)+'/test'
-filename = os.path.dirname(__file__)+'/data'
+filename = os.path.dirname(__file__)+'/test'
+#filename = os.path.dirname(__file__)+'/data'
 
 file = open(filename,'r')
 
