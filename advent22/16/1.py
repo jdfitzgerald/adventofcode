@@ -16,6 +16,17 @@ def max_remaining_pressure(onvalves, minutes):
 
     return score
 
+def cost(a,b):
+    queue = [(a,[a])]
+    while queue:
+        (v,path) = queue.pop()
+        for t in valves[v]['tunnels'] - set(path):
+            if t == b:
+                print("dist from %s to %s is"%(a,b),path)
+                return len(path)
+            else:
+                queue.insert(0,(t,path+[t]))
+
 pp = pprint.PrettyPrinter(indent=2)
 filename = os.path.dirname(__file__)+'/test'
 #filename = os.path.dirname(__file__)+'/data'
@@ -29,54 +40,22 @@ valves = {}
 # build the graph
 for line in [l.strip() for l in file]:
     [name, rate, tunnels] = rex.match(line).groups()
-    tunnels = tunnels.split(', ')
+    tunnels = set(tunnels.split(', '))
     valve={'name':name, 'rate':int(rate), 'tunnels':tunnels}
     valves[name] = valve
 
-pp.pprint(valves)
+graph = {'AA':{}}
+for cur in valves:
+    if valves[cur]['rate'] > 0:
+        graph[cur] = {}
+        for v in graph:
+            if v != cur:
+                c = cost(v,cur)
+                graph[v][cur] = c
+                graph[cur][v] = c
 
-max_score = 0
 
-# depth first based on minutes? Or breadth?
-@lru_cache
-def stepnscore(ptotal, valve, minutes, onvalves):
-    global max_score
 
-    if minutes <= 1: raise Exception('wtf')
+pp.pprint(graph)
 
-    if minutes == 2: 
-        if valve not in onvalves:
-            return ptotal+valves[valve]['rate']
-        else:
-            return ptotal
-    max_poss = max_remaining_pressure(onvalves, minutes)
-
-    if max_poss == 0:
-        return ptotal
-
-    if ptotal + max_poss < max_score:
-        return ptotal
-    
-    phere = valves[valve]['rate'] * (minutes-1)
-    pressures = []
-
-    if valve not in onvalves and phere > 0:
-        onvalves1 = tuple(sorted(onvalves + (valve,)))
-        if minutes==3:
-            pressures.append(phere)
-        else:
-            for next_valve in valves[valve]['tunnels']:
-                p = stepnscore(ptotal+phere, next_valve, minutes-2, onvalves1)
-                pressures.append(p)
-
-    for next_valve in valves[valve]['tunnels']:
-        p = stepnscore(ptotal, next_valve, minutes-1, onvalves)
-        pressures.append(p)
-
-    score = max(pressures)
-    max_score = max(max_score, score)
-
-    return score
-
-mins = 30
-print('mins',mins,'result',stepnscore(0,'AA',mins,tuple()))
+quit()
