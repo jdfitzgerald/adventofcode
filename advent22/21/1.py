@@ -15,14 +15,16 @@ class Monkey:
         self.op = op
         self.left = left
         self.right = right
+        self.vleft = None
+        self.vright = None
 
     def update_vals(self, name, val):
         if name == self.left:
-            self.left = val
+            self.vleft = val
         if name == self.right:
-            self.right = val
-        if not isinstance(self.right, str) and not isinstance(self.left, str):
-            v = eval('%d %s %d'%(self.left,self.op,self.right))
+            self.vright = val
+        if self.vright is not None and self.vleft is not None:
+            v = eval('%d %s %d'%(self.vleft,self.op,self.vright))
             self.val=v
 
 
@@ -60,13 +62,69 @@ class MonkeyTree:
                     for name in self.mappings[m]:
                         self.monkeys[name].update_vals(m,self.monkeys[m].val)
 
+    def find_route(self,m,dest):
+        monkey = self.monkeys[m]
 
-monkey_tree = MonkeyTree()
+        if monkey.left == dest:
+            return 'L'
+        elif monkey.right == dest:
+            return 'R'
+        
+        if monkey.left is not None:
+            path = self.find_route(monkey.left,dest)
+            if path is not None:
+                return 'L'+path
+
+        if monkey.right is not None:
+            path = self.find_route(monkey.right,dest)
+            if path is not None:
+                return 'R'+path
+
+        return None
+
+
+mt = MonkeyTree()
 
 for line in [l.strip() for l in file]:
     (name, op) = line.split(': ')
-    monkey_tree.add_monkey(name, op)
+    mt.add_monkey(name, op)
 
-monkey_tree.resolve()
+mt.resolve()
 
-print(monkey_tree.monkeys['root'].val)
+
+route = mt.find_route('root','humn')
+print(route)
+
+root = mt.monkeys['root']
+
+if route[0] == 'L':
+    node = mt.monkeys[root.left]
+    target = root.vright
+else:
+    node = mt.monkeys[root.right]
+    target = root.vleft
+
+for side in route[1:]:
+    if side == 'L':
+        if node.op == '-':
+            target = target + node.vright
+        elif node.op == '/':
+            target = target * node.vright
+        elif node.op == '+':
+            target = target - node.vright
+        elif node.op == '*':
+            target = target / node.vright
+        node = mt.monkeys[node.left]
+    else:
+        if node.op == '-':
+            target = node.vleft - target
+        elif node.op == '/':
+            target = node.vleft/target
+        elif node.op == '+':
+            target = target - node.vleft
+        elif node.op == '*':
+            target = target/node.vleft
+        node = mt.monkeys[node.right]
+
+
+print(target)

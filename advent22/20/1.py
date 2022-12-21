@@ -3,8 +3,9 @@ import os
 
 pp = pprint.PrettyPrinter(indent=2)
 
-#filename = os.path.dirname(__file__)+'/test'
-filename = os.path.dirname(__file__)+'/data'
+filename = os.path.dirname(__file__)+'/test'
+#filename = os.path.dirname(__file__)+'/data'
+#filename = os.path.dirname(__file__)+'/test2'
 
 class Node:
     def __init__(self, val):
@@ -93,9 +94,9 @@ for line in [l.strip() for l in file]:
 nlist.encrypt()
 zero_node = nlist.find_by_val(0)
 
+nlist.print()
 node1 = nlist.find_by_steps(zero_node,1000)
 node2 = nlist.find_by_steps(node1,1000)
 node3 = nlist.find_by_steps(node2,1000)
 
-nlist.print()
 print(node1.val,node2.val,node3.val,node1.val+node2.val+node3.val)
