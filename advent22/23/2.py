@@ -17,26 +17,24 @@ for (y,line) in enumerate([l.strip() for l in file]):
 
 def check_move(elf,dir):
     (x,y) = dir
+    (elf_x,elf_y) = elf
     checks = []
     if x == 0:
-        if
-        checks.append(tuple(np.add(elf,(-1,y))))
-        checks.append(tuple(np.add(elf,(0,y))))
-        checks.append(tuple(np.add(elf,(1,y))))
+        if (   ((elf_x+1, elf_y+y) in elves) 
+            or ((elf_x, elf_y+y) in elves) 
+            or ((elf_x-1, elf_y+y) in elves)):
+            return False;
     else:
-        checks.append(tuple(np.add(elf,(x,-1))))
-        checks.append(tuple(np.add(elf,(x,0))))
-        checks.append(tuple(np.add(elf,(x,1))))
-    
-    for c in checks:
-        if c in elves:
-            return False
+        if (   ((elf_x+x, elf_y+1) in elves) 
+            or ((elf_x+x, elf_y) in elves) 
+            or ((elf_x+x, elf_y-1) in elves)):
+            return False;
     return True
 
 
 def check_move_old(elf,dir):
     (x,y) = dir
-    checks = []
+    checks = [] 
     if x == 0:
         checks.append(tuple(np.add(elf,(-1,y))))
         checks.append(tuple(np.add(elf,(0,y))))
@@ -96,12 +94,14 @@ def moving_elves():
 
 
 direction = gen_directions()
-max = 10
+max = 3000
 for round in range(1,max+1):
     targets = {}
     directions = [next(direction) for i in range(4)]
 
     moving = moving_elves()
+    if len(moving) == 0:
+        break
     for elf in moving:
         for dir in directions:
             if check_move(elf,dir):
@@ -118,9 +118,11 @@ for round in range(1,max+1):
             elves.add(new_elf)
             elves.remove(old_elf)
     
+    if (round%50 == 0):
+        print("round %d moving %d"%(round,len(moving)))
     next(direction)
 
 ((minx, miny), (maxx, maxy)) = elf_bounds()
 area = (1+maxx-minx)*(1+maxy-miny)
 space = area - len(elves)
-print(space)
+print(round)
