@@ -11,7 +11,6 @@ fn main() {
     if let Ok(lines) = read_lines(path) {
         for line in lines {
             if let Ok(s) = line {
-                println!("{}", s);
                 let fixed = s
                     .replace("one","1")
                     .replace("two","2")
@@ -22,7 +21,6 @@ fn main() {
                     .replace("seven","7")
                     .replace("eight","8")
                     .replace("nine","9");
-                println!("{}", fixed);
                 let digits: Vec<char> = fixed.chars().filter(|c| c.is_digit(10)).collect();
                 if let Some(first) = digits.first() {
                     if let Some(last) = digits.last() {
