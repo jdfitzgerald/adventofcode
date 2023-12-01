@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable '01'",
+            "name": "Debug executable '${fileBasenameNoExtension}'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=01",
+                    "--bin=${fileBasenameNoExtension}",
                     "--package=advent23"
                 ],
                 "filter": {
-                    "name": "01",
+                    "name": "${fileBasenameNoExtension}",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable '01'",
+            "name": "Debug unit tests in executable '${fileBasenameNoExtension}'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=01",
+                    "--bin=${fileBasenameNoExtension}",
                     "--package=advent23"
                 ],
                 "filter": {
-                    "name": "01",
+                    "name": "${fileBasenameNoExtension}",
                     "kind": "bin"
                 }
             },
