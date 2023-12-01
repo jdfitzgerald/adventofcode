@@ -3,12 +3,13 @@ use std::io;
 use std::io::BufRead;
 use std::path::Path;
 
-// 54953 is incorrect
-// 54965 is also too high
+// things I learned today: 1 - I am not very good at rust.
+//                         2 - I am not very good with windows or vscode
+
 fn main() {
-    //let path = "data/01/real.data";
+    let path = "data/01/real.data";
     //let path = "data/01/test.data";
-    let path = "data/01/test2.data";
+    //let path = "data/01/test2.data";
     let mut total:i32 = 0;
     if let Ok(lines) = read_lines(path) {
         for line in lines {
@@ -16,7 +17,7 @@ fn main() {
             let mut first = ' ';
             let mut last = ' ';
             let blah = line.unwrap();
-            println!("{}",blah);
+            print!("{} ",blah);
             for c in blah.chars() {
                 if c.is_digit(10) {
                     first = c;
@@ -58,12 +59,12 @@ fn main() {
                     .replace("seven","7")
                     .replace("eight","8")
                     .replace("nine","9");
-                if s.chars().last().unwrap().is_digit(10) {
-                    last = s.chars().last().unwrap();
+                let x = s.chars().next().unwrap();
+                if x.is_digit(10) {
+                    last = x;
                     break;
                 }
             }
-            println!("{} {}", first, last);
             let number:i32 = format!("{}{}",first,last).parse().unwrap();
             total += number;
             println!("{}", number)
