@@ -1,5 +1,5 @@
-import pprint 
-import math 
+import pprint
+import math
 pp = pprint.PrettyPrinter(indent=2)
 
 file = open('day04/real.data','r')
