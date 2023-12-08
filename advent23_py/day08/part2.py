@@ -30,37 +30,30 @@ while line := file.readline().strip():
     (node.left, node.right) = children[1:-1].split(', ')
     nodelist[node.loc] = node
 
-steps = 0
-next_step = path_gen(path)
 
 
-current_nodes = [node for k,node in nodelist.items() if k[2]=='A']
+current_nodes = [k for k,node in nodelist.items() if k[2]=='A']
 
-visited = {}
-print([node.loc for node in current_nodes])
-for dir in next_step:
-    hash = ''.join(sorted([node.loc for node in current_nodes]))
-    if hash in visited:
-        print('loop')
-        break
-    visited[hash]=1
+scores = {}
 
-    steps += 1
-    z_count = 0
-    for i,node in enumerate(current_nodes):
+for k in current_nodes:
+    steps = 0
+    next_step = path_gen(path)
+    node = nodelist[k]
+
+    for dir in next_step:
+        steps += 1
         if dir == 'L':
             node = nodelist[node.left]
         else:
             node = nodelist[node.right]
-    
+
         if node.loc[2] == 'Z':
-            z_count += 1
-        current_nodes[i]=node
+            print(k, steps)
+            scores[k] = steps
+            break
+    
+print(scores)
 
-
-    if z_count > 1:
-        print(''.join(sorted([node.loc for node in current_nodes])), z_count)
-    if z_count == len(current_nodes):
-        break
-
-print(steps)
+import math
+print(math.lcm(*scores.values()))
