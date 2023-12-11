@@ -20,7 +20,7 @@ expanding_cols = {j for (i,j) in galaxies}.symmetric_difference(range(0,width))
 
 # change this to 1 to get part 1 answer
 # there's some off by one thing I can't be arsed figuring out
-expansion_rate = 999999 
+expansion_rate = 1 
 for g in galaxies:
     g[0] += sum([ expansion_rate for i in expanding_rows if i < g[0]])
     g[1] += sum([ expansion_rate for i in expanding_cols if i < g[1]])
