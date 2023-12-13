@@ -8,8 +8,8 @@ maybe_spaces = r"[^#]*"
 
 # 9659 too high
 sum = 0
-#file = open('day12/real.data','r')
-file = open('day12/test.data','r')
+file = open('day12/real.data','r')
+#file = open('day12/test.data','r')
 for line in [l.strip() for l in file]:
     (search,expected) = line.split(' ')
     expected = [int(x) for x in expected.split(',')]
@@ -17,8 +17,13 @@ for line in [l.strip() for l in file]:
     search = '.' + search + '.' # pad to ensure there's always a leading and trailing dot
 
     patterns = []
+
+    total_damaged = 0
     for n in expected:
+        total_damaged += n
         patterns.append(space + char + '{' + str(n) + '}')
+
+    full_regex = maybe_spaces.join(patterns)
 
     matches = []
     matches.append((0,search))
@@ -38,7 +43,7 @@ for line in [l.strip() for l in file]:
 
                 replaced = match[:(offset + start)].replace('?','.')+'.' + ('#' * expected[i]) + post
 
-                if re.search(remaining,post):
+                if re.search(full_regex,replaced) and (replaced.count('#') <= total_damaged): # edge case
                     new_matches.append(((offset + start + expected[i] +1 ), replaced))
 
             matches = new_matches
@@ -46,10 +51,9 @@ for line in [l.strip() for l in file]:
     
     sum += len(matches)
 
-    print(search, expected)
-    pp.pprint(matches)
+    print('  ', search, expected)
+    pp.pprint([m for (_,m) in matches])
     print(len(matches))
     print()
-
 
 print(sum)
