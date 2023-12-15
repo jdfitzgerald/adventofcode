@@ -1,21 +1,30 @@
 import re
 import pprint 
+import cProfile, pstats, io
+from pstats import SortKey
+
+pr = cProfile.Profile()
+pr.enable()
+
 pp = pprint.PrettyPrinter(indent=2)
 
 char = r"[\?#]"
 space = r"[^#]"
-maybe_spaces = r"[^#]*"
+maybe_spaces = r"[^#]*?"
 
-# 9659 too high
 sum = 0
-file = open('day12/real.data','r')
-#file = open('day12/test.data','r')
+#file = open('day12/real.data','r')
+file = open('day12/test.data','r')
+
+
+
 for (lnum,line) in enumerate([l.strip() for l in file]):
 
+    factor = 5
     (search,expected) = line.split(' ')
     print(lnum,search)
-    search = "?".join([search]*5)
-    expected = ",".join([expected]*5)
+    search = "?".join([search]*factor)
+    expected = ",".join([expected]*factor)
 
     expected = [int(x) for x in expected.split(',')]
 
@@ -48,7 +57,7 @@ for (lnum,line) in enumerate([l.strip() for l in file]):
 
                 replaced = match[:(offset + start)].replace('?','.')+'.' + ('#' * expected[i]) + post
 
-                if re.search(full_regex,replaced) and (replaced.count('#') <= total_damaged): # edge case
+                if (replaced.count('#') <= total_damaged) and re.search(full_regex,replaced): # edge case
                     new_matches.append(((offset + start + expected[i] +1 ), replaced))
 
             matches = new_matches
@@ -64,3 +73,6 @@ for (lnum,line) in enumerate([l.strip() for l in file]):
     """
 
 print(sum)
+
+p = pstats.Stats(pr)
+p.strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(20)
