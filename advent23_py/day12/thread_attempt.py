@@ -3,6 +3,8 @@ import pprint
 import cProfile, pstats, io
 from pstats import SortKey
 
+from concurrent.futures import ThreadPoolExecutor
+
 pr = cProfile.Profile()
 pr.enable()
 
@@ -13,13 +15,25 @@ space = r"[^#]"
 maybe_spaces = r"[^#]*?"
 
 sum = 0
-file = open('day12/real.data','r')
-#file = open('day12/test.data','r')
+#file = open('day12/real.data','r')
+file = open('day12/test.data','r')
 
 
+def parse_match(r):
+    start = r.span()[0]
+    post = '.' + m[start+expected[i]+2:]
 
+    #replaced = match[:(offset + start)].replace('?','.')+'.' + ('#' * expected[i]) + post
+    replaced = match[:(offset + start)]+'.' + ('#' * expected[i]) + post
+
+    if fr.match(replaced): 
+        return ((offset + start + expected[i] +1 ), replaced)
+    else:
+        return None
+
+thread_pool = ThreadPoolExecutor(max_workers=16)
 for (lnum,line) in enumerate([l.strip() for l in file]):
-    factor = 5
+    factor = 1
     (search,expected) = line.split(' ')
     print(lnum,search)
     search = "?".join([search]*factor)
@@ -54,17 +68,8 @@ for (lnum,line) in enumerate([l.strip() for l in file]):
         new_matches = []
         for (offset,match) in matches:
             m = match[offset:]
-            for r in re.finditer(rex, m):
-                start = r.span()[0]
-                post = '.' + m[start+expected[i]+2:]
-
-                #replaced = match[:(offset + start)].replace('?','.')+'.' + ('#' * expected[i]) + post
-                replaced = match[:(offset + start)]+'.' + ('#' * expected[i]) + post
-
-                if fr.match(replaced): 
-                    new_matches.append(((offset + start + expected[i] +1 ), replaced))
-
-            matches = new_matches
+            new_matches = thread_pool.map(parse_match, re.finditer(rex, m))
+            matches += [m for m in new_matches if m is not None]
 
     
     sum += len(matches)
@@ -76,7 +81,12 @@ for (lnum,line) in enumerate([l.strip() for l in file]):
     print()
     """
 
+thread_pool.shutdown()
+
 print(sum)
 
 p = pstats.Stats(pr)
 p.strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(15)
+
+
+
