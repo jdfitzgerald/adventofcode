@@ -1,13 +1,13 @@
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
+# 484 is wrong
 
 #file = open('02/test.data','r')
 file = open('02/real.data','r')
 
 def check_list(row, skips):
     safe = 1
-
 
     for i,x in enumerate(row):
         if i == 0:
@@ -20,23 +20,27 @@ def check_list(row, skips):
             if skips == 0:
                 skips = 1
                 safe = check_list(row[:i]+row[(i+1):],skips)
-                if safe: return 1
+                if safe: break
 
                 safe = check_list(row[:(i-1)]+row[i:],skips)
-                if safe: return 1
-                else: return 0
+                if safe: break
 
-                continue
+                safe = check_list(row[:(i-2)]+row[i-1:],skips)
+
+                break
             safe = 0
             break
         last_d = d
         last = x
+    print(row,safe)
     return safe
 
 
 total = 0
 for line in [l.strip() for l in file]:
     row = [int(x) for x in line.split()]
+
+    print('x',row)
 
     safe = check_list(row,0)
 
